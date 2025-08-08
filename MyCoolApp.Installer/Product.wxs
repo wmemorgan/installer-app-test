@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="My Cool App" 
+           Manufacturer="Your Company Name" 
+           Version="1.0.0.0" 
+           UpgradeCode="CD6D9730-441A-437B-B6B9-7A67B0BED9AE">
+    
+    <!-- Package properties -->
+    <SummaryInformation Keywords="Installer,MyCoolApp"
+                       Description="My Cool App Installer"
+                       Manufacturer="Your Company Name" />
+    
+    <!-- Media definition for CAB file -->
+    <Media Id="1" Cabinet="MyCoolApp.cab" EmbedCab="yes" />
+    
+    <!-- Major upgrade handling -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of My Cool App is already installed." />
+    
+    <!-- Installation directory structure -->
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="MyCoolApp">
+        
+        <!-- Main executable component -->
+        <Component Id="MyCoolAppExecutable">
+          <File Id="MyCoolAppExe" 
+                Source="../MyCoolApp/bin/Release/net8.0/MyCoolApp.exe" 
+                KeyPath="yes" />
+        </Component>
+        
+        <!-- Runtime configuration file (.NET 8.0 always generates this) -->
+        <Component Id="MyCoolAppRuntimeConfig">
+          <File Id="MyCoolAppRuntimeConfig" 
+                Source="../MyCoolApp/bin/Release/net8.0/MyCoolApp.runtimeconfig.json" 
+                KeyPath="yes" />
+        </Component>
+        
+        <!-- Dependencies configuration file (.NET 8.0 always generates this) -->
+        <Component Id="MyCoolAppDepsConfig">
+          <File Id="MyCoolAppDepsConfig" 
+                Source="../MyCoolApp/bin/Release/net8.0/MyCoolApp.deps.json" 
+                KeyPath="yes" />
+        </Component>
+        
+        <!-- Main application DLL (if generated) -->
+        <Component Id="MyCoolAppDll">
+          <File Id="MyCoolAppDll" 
+                Source="../MyCoolApp/bin/Release/net8.0/MyCoolApp.dll" 
+                KeyPath="yes" />
+        </Component>
+        
+      </Directory>
+    </StandardDirectory>
+    
+    <!-- Start Menu folder -->
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="My Cool App">
+        <Component Id="ApplicationShortcut">
+          <Shortcut Id="ApplicationStartMenuShortcut"
+                   Name="My Cool App"
+                   Target="[INSTALLFOLDER]MyCoolApp.exe"
+                   WorkingDirectory="INSTALLFOLDER" />
+          <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+          <RegistryValue Root="HKCU" 
+                        Key="Software\YourCompany\MyCoolApp" 
+                        Name="installed" 
+                        Type="integer" 
+                        Value="1" 
+                        KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+    
+    <!-- Desktop shortcut (optional) -->
+    <StandardDirectory Id="DesktopFolder">
+      <Component Id="DesktopShortcut">
+        <Shortcut Id="ApplicationDesktopShortcut"
+                 Name="My Cool App"
+                 Target="[INSTALLFOLDER]MyCoolApp.exe"
+                 WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKCU" 
+                      Key="Software\YourCompany\MyCoolApp" 
+                      Name="desktopShortcut" 
+                      Type="integer" 
+                      Value="1" 
+                      KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+    
+    <!-- Feature definition -->
+    <Feature Id="MainApplication" Title="My Cool App" Level="1">
+      <ComponentRef Id="MyCoolAppExecutable" />
+      <ComponentRef Id="MyCoolAppRuntimeConfig" />
+      <ComponentRef Id="MyCoolAppDepsConfig" />
+      <ComponentRef Id="MyCoolAppDll" />
+      <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+    
+  </Package>
+</Wix>
