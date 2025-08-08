@@ -65,6 +65,7 @@ After installation, verify WiX is properly installed:
    - WiX Library
 
 ## Project Structure
+```
 MyCoolApp/ ├── MyCoolApp/                # Main console application 
 		   │   ├── Program.cs            # Application entry point 
 		   │   └── MyCoolApp.csproj      # Project file 
@@ -73,6 +74,7 @@ MyCoolApp/ ├── MyCoolApp/                # Main console application
 		   │   └── MyCoolApp.Installer.wixproj  # WiX project file 
 		   ├── README.md                # This file 
 		   └── LICENSE.txt              # MIT License
+```
 
 
 ## Building the Project
