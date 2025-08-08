@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="My Cool App" 
-           Manufacturer="Your Company Name" 
+           Manufacturer="My Cool Company" 
            Version="1.0.0.0" 
-           UpgradeCode="CD6D9730-441A-437B-B6B9-7A67B0BED9AE">
+           UpgradeCode="{CD6D9730-441A-437B-B6B9-7A67B0BED9AE}">
     
     <!-- Package properties -->
     <SummaryInformation Keywords="Installer,MyCoolApp"
-                       Description="My Cool App Installer"
-                       Manufacturer="Your Company Name" />
+                       Description="My Cool App Installer - Self-Contained"
+                       Manufacturer="My Cool Company"
+                       Comments="Self-contained .NET 8.0 application installer" />
+    
+    <!-- Additional package properties for Windows -->
+    <Property Id="ARPCONTACT" Value="support@mycoolcompany.example" />
+    <Property Id="ARPURLINFOABOUT" Value="https://www.mycoolcompany.example" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="ARPNOREPAIR" Value="1" />
     
     <!-- Media definition for CAB file -->
     <Media Id="1" Cabinet="MyCoolApp.cab" EmbedCab="yes" />
@@ -18,37 +26,7 @@
     
     <!-- Installation directory structure -->
     <StandardDirectory Id="ProgramFiles6432Folder">
-      <Directory Id="INSTALLFOLDER" Name="MyCoolApp">
-        
-        <!-- Main executable component -->
-        <Component Id="MyCoolAppExecutable">
-          <File Id="MyCoolAppExe" 
-                Source="../MyCoolApp/bin/Release/net8.0/MyCoolApp.exe" 
-                KeyPath="yes" />
-        </Component>
-        
-        <!-- Runtime configuration file (.NET 8.0 always generates this) -->
-        <Component Id="MyCoolAppRuntimeConfig">
-          <File Id="MyCoolAppRuntimeConfig" 
-                Source="../MyCoolApp/bin/Release/net8.0/MyCoolApp.runtimeconfig.json" 
-                KeyPath="yes" />
-        </Component>
-        
-        <!-- Dependencies configuration file (.NET 8.0 always generates this) -->
-        <Component Id="MyCoolAppDepsConfig">
-          <File Id="MyCoolAppDepsConfig" 
-                Source="../MyCoolApp/bin/Release/net8.0/MyCoolApp.deps.json" 
-                KeyPath="yes" />
-        </Component>
-        
-        <!-- Main application DLL (if generated) -->
-        <Component Id="MyCoolAppDll">
-          <File Id="MyCoolAppDll" 
-                Source="../MyCoolApp/bin/Release/net8.0/MyCoolApp.dll" 
-                KeyPath="yes" />
-        </Component>
-        
-      </Directory>
+      <Directory Id="INSTALLFOLDER" Name="MyCoolApp" />
     </StandardDirectory>
     
     <!-- Start Menu folder -->
@@ -78,7 +56,7 @@
                  Target="[INSTALLFOLDER]MyCoolApp.exe"
                  WorkingDirectory="INSTALLFOLDER" />
         <RegistryValue Root="HKCU" 
-                      Key="Software\YourCompany\MyCoolApp" 
+                      Key="Software\MyCoolCompany\MyCoolApp" 
                       Name="desktopShortcut" 
                       Type="integer" 
                       Value="1" 
@@ -86,12 +64,9 @@
       </Component>
     </StandardDirectory>
     
-    <!-- Feature definition -->
+    <!-- Feature definition - Reference the generated component group -->
     <Feature Id="MainApplication" Title="My Cool App" Level="1">
-      <ComponentRef Id="MyCoolAppExecutable" />
-      <ComponentRef Id="MyCoolAppRuntimeConfig" />
-      <ComponentRef Id="MyCoolAppDepsConfig" />
-      <ComponentRef Id="MyCoolAppDll" />
+      <ComponentGroupRef Id="PublishedFilesGroup" />
       <ComponentRef Id="ApplicationShortcut" />
       <ComponentRef Id="DesktopShortcut" />
     </Feature>

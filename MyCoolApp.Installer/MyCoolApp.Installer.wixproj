@@ -1,2 +1,50 @@
-﻿<Project Sdk="WixToolset.Sdk/6.0.1">
+<Project Sdk="WixToolset.Sdk/6.0.1">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <OutputType>Package</OutputType>
+    <OutputName>MyCoolAppInstaller</OutputName>
+  </PropertyGroup>
+
+  <!-- Define paths -->
+  <PropertyGroup>
+    <MyCoolAppProjectPath>../MyCoolApp/MyCoolApp.csproj</MyCoolAppProjectPath>
+    <GeneratedFilesWxs>GeneratedFiles.wxs</GeneratedFilesWxs>
+  </PropertyGroup>
+
+  <!-- Force console app to publish before installer builds -->
+  <Target Name="PublishConsoleAppFirst" BeforeTargets="BeforeResolveReferences">
+    <Message Text="Step 1: Publishing MyCoolApp as self-contained..." Importance="high" />
+    <MSBuild Projects="$(MyCoolAppProjectPath)" 
+             Properties="Configuration=$(Configuration);Platform=AnyCPU;RuntimeIdentifier=win-x64;SelfContained=true" 
+             Targets="Publish" />
+  </Target>
+
+  <!-- Generate files list with PowerShell automatically -->
+  <Target Name="GenerateFilesList" BeforeTargets="BeforeResolveReferences" DependsOnTargets="PublishConsoleAppFirst">
+    <Message Text="Step 2: Generating files list with PowerShell..." Importance="high" />
+    <Message Text="Current directory: $(MSBuildProjectDirectory)" Importance="high" />
+    <Message Text="Looking for: $(MSBuildProjectDirectory)\Generate-Files.ps1" Importance="high" />
+    
+    <Exec Command="powershell -ExecutionPolicy Bypass -File Generate-Files.ps1" 
+          ContinueOnError="false"
+          IgnoreExitCode="false"
+          WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Text="Step 3: GeneratedFiles.wxs updated successfully" Importance="high" />
+  </Target>
+
+  <!-- Include the generated file in compilation -->
+  <ItemGroup>
+    <Compile Include="$(GeneratedFilesWxs)" />
+  </ItemGroup>
+
+  <!-- Clean generated files when cleaning project -->
+  <Target Name="CleanGeneratedFiles" BeforeTargets="Clean">
+    <Message Text="Cleaning generated files..." Importance="high" />
+    <Delete Files="$(GeneratedFilesWxs)" Condition="Exists('$(GeneratedFilesWxs)')" />
+    <MSBuild Projects="$(MyCoolAppProjectPath)" 
+             Properties="Configuration=$(Configuration);Platform=AnyCPU" 
+             Targets="Clean" />
+  </Target>
+
 </Project>
